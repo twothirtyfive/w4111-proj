@@ -1,0 +1,47 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h1>European soccer database</h1>
+  <p>This database has the following tables:</p>
+  <p>players(pid,prating,pname, pgoal, PK(pid))</p>
+  <p>manager(mid, mname, PK(mid))</p>
+  <p>manages(tid, mid, since, PK(mid, since))</p>
+  <p>country(cid, cname, PK(cid))</p>
+  <p>league(lid, lname, PK(lid))</p>
+  <p>match(mid, mdate, PK(mid))</p>
+  <div>{{data}}</div>
+  <table border=1>  
+    {% for res in result %}
+    	<tr>
+			{% for value in res[:] %}
+			<td>{{value}}</td>
+			{% endfor %}
+		</tr>
+    {% endfor %}
+  </table>
+
+
+
+    <form method="POST" action="/query">
+          <p>Enter query here: <input type="text" name="query"> 
+		  <input type="submit" value="query"></p>
+    </form>
+
+<p><a href ="insert"> Go to insertion page</a></p>
+<p><a href="delete">Go to deletion page</a></p>
+
+<form method="POST" action="/delete">
+<p>Delete row(s) here:<input type="text" name="delete"><input type="submit" value="delete"></p>
+</form>
+
+</body>
+
+
+</html>
