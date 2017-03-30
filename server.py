@@ -80,58 +80,77 @@ def teardown_request(exception):
 	pass
 
 
-#
-# @app.route is a decorator around index() that means:
-#   run index() whenever the user tries to access the "/" path using a GET request
-#
-# If you wanted the user to go to, for example, localhost:8111/foobar/ with POST or GET then you could use:
-#
-#       @app.route("/foobar/", methods=["POST", "GET"])
-#
-# PROTIP: (the trailing / in the path is important)
-# 
-# see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
-# see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
-#
-@app.route('/')
+def home_init():
+    query = "select cname from country"
+    cursor = g.conn.execute(query)
+    countries = []
+    for country in cursor:
+        countries.append(country[0])
+    cursor.close()
+    return countries
+
+
+@app.route('/', methods=['GET'])
 def index():
-  """
-  request is a special object that Flask provides to access web request information:
-
-  request.method:   "GET" or "POST"
-  request.form:     if the browser submitted a form, this contains the data in the form
-  request.args:     dictionary of URL arguments, e.g., {a:1, b:2} for http://localhost?a=1&b=2
-
-  See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
-  """
-
   # DEBUG: this is debugging code to see what request looks like
   print request.args
-  return render_template("index.html")
-#
-# This is an example of a different path.  You can see it at:
-# 
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#
-@app.route('/another')
-def another():
-  return render_template("another.html")
-
+  #Query to get all table names
+  #query="SELECT table_name FROM information_schema.tables WHERE table_schema='gx2127' ORDER BY table_schema,table_name;"
+  # query = "select cname from country"
+  # cursor = g.conn.execute(query)
+  # countries = []
+  # for country in cursor:
+  #     countries.append(country)
+  # cursor.close()
+  return render_template("home.html", countries=home_init())
 
 @app.route('/query', methods=['POST'])
 def query():
   query = request.form['query']
-  #g.conn.execute('INSERT INTO players(pid,pname) VALUES (15, ?);', name)
   cursor=g.conn.execute(query)
   result = []
   for res in cursor:
+
 	result.append(res)  # can also be accessed using result[0]
   cursor.close()
   return render_template("index.html", result=result)
-  
+
+@app.route('/country', methods=['POST','GET'])
+def country_top_scorer():
+    word=request.form.get('which_country')
+    max_min=request.form.get('max/min')
+    age=request.form.get('age')
+    year=request.form.get('year')
+    year_born=int(year)-int(age)
+    year_born=str(year_born)+"-01-01"
+    if max_min=='max':
+        query = "select distinct foo3.pname, t.tname, l.lname, c.cname, foo3.pgoal,foo3.birthday from " \
+                "(select p.pname, p.pid, p.pgoal, p.birthday from players p where p.pgoal in (select max(pgoal)from " \
+                "(select t.tid, foo1.cid, foo1.lid, t.tname from team t, belongs_tl btl,(select c.cid, l.lid " \
+                "from country c, league l, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid ) as foo1 where " \
+                "t.tid=btl.tid and foo1.lid=btl.lid) as foo2, players p, plays_in py, country c where p.pid=py.pid " \
+                "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
+                "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
+                "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
+    else:
+        query = "select distinct foo3.pname, t.tname, l.lname, c.cname, foo3.pgoal, foo3.birthday from " \
+                "(select p.pname, p.pid, p.pgoal, p.birthday from players p where p.pgoal in (select min(pgoal)from " \
+                "(select t.tid, foo1.cid, foo1.lid, t.tname from team t, belongs_tl btl,(select c.cid, l.lid " \
+                "from country c, league l, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid ) as foo1 where " \
+                "t.tid=btl.tid and foo1.lid=btl.lid) as foo2, players p, plays_in py, country c where p.pid=py.pid " \
+                "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
+                "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
+                "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
+    cursor=g.conn.execute(query, (word,year_born))
+    result=[]
+    for res in cursor:
+        result.append(res)
+    cursor.close()
+    print request.args
+    return render_template("home.html", scorer=result,countries=home_init())
+
+
+
 
 @app.route('/insert', methods=['POST','GET'])
 def insert():

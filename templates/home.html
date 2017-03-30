@@ -1,0 +1,98 @@
+<html>
+  <style>
+    body{
+      font-size: 15pt;
+      font-family: arial;
+    }
+  </style>
+
+
+<body>
+  <h1>European soccer database</h1>
+  <p>This database has the following tables:</p>
+  <p>players(pid,prating,pname, pgoal, PK(pid))</p>
+  <p>manager(mid, mname, PK(mid))</p>
+  <p>manages(tid, mid, since, PK(mid, since))</p>
+  <p>country(cid, cname, PK(cid))</p>
+  <p>league(lid, lname, PK(lid))</p>
+  <p>match(mid, mdate, PK(mid))</p>
+  <p>team(tid, tname, PK(tid))</p>
+  <p>belongs_cl(lid, since, PK(lid))</p>
+  <p>belongs_lc(lid, cid, since, PK(lid))</p>
+  <p>belongs_tc(tid, since,PK(tid))</p>
+  <p>belongs_tl(tid, lid since, PK(tid, lid))</p>
+  <p>champions_league(tid, lid, PK(lid))</p>
+  <p>participate(tid, mid, tid2, PK(mid))</p>
+  <p>plays_in(pid, tid, since, PK(pid))</p>
+
+  <div>{{data}}</div>
+  <table border=1>
+    {% for res in result %}
+    	<tr>
+			{% for value in res[:] %}
+			<td>{{value}}</td>
+			{% endfor %}
+		</tr>
+    {% endfor %}
+  </table>
+
+<p>Select a country to see who is the best/worst scorer in this country</p>
+  <form action={{url_for('country_top_scorer')}} method='POST'>
+    <select name="which_country">
+        {% for country in countries %}
+        <option value="{{country}}">{{country}}</option>
+        {% endfor %}
+    </select>
+      <select name="max/min">
+            <option value='max'>best</option>
+            <option value='min'>worst</option>
+        </select>
+      <select name="age">
+        <option value=18>>=18</option>
+          <option value=25>>=25</option>
+          <option value=28>>=28</option>
+          <option value=30>>=30</option>
+          <option value=35>>=35</option>
+    </select>
+            <select name="year">
+                {% for year in range(1995, 2020) %}
+                    <option value="{{year}}">{{year}}</option>
+                {% endfor %}
+
+    </select>
+    <button  type="submit">Go!</button>
+</form>
+
+
+    <table border=1>
+        <thead>
+            <td>Name</td>
+            <td>Team</td>
+            <td>League</td>
+            <td>Country</td>
+            <td>Goals</td>
+            <td>Birthday</td>
+         </thead>
+    {% for res in scorer %}
+    	<tr>
+			{% for value in res %}
+			<td>{{value}}</td>
+			{% endfor %}
+		</tr>
+    {% endfor %}
+  </table>
+
+
+
+<p><a href ="insert">Insert records</a></p>
+<p><a href="delete">Delete records</a></p>
+
+    <form method="POST" action="/query">
+          <p>Enter query here: <input type="text" name="query">
+		  <input type="submit" value="query"></p>
+    </form>
+
+</body>
+
+
+</html>
