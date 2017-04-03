@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+   <body>
+   
+      <table border = 1>
+         <thead>
+            <td>Manager ID</td>
+            <td>Manager Name</td>
+         </thead>
+         
+     {% for res in result %}
+    	<tr>
+			{% for value in res[:] %}
+			<td>{{value}}</td>
+			{% endfor %}
+		</tr>
+    {% endfor %}
+      </table>
+      
+      <a href = "/">Go back to home page</a>
+      
+   </body>
+</html>

@@ -91,60 +91,46 @@ def home_init():
 
 
 @app.route('/', methods=['GET'])
-def index():
+def home():
  # DEBUG: this is debugging code to see what request looks like
  print request.args
- return render_template("home.html", countries=home_init())
+ return render_template("home.html", Countries=home_init(), countries=home_init())
 
-@app.route('/query', methods=['POST'])
-def query():
- query = request.form['query']
- cursor=g.conn.execute(query)
- result = []
- for res in cursor:
 
-  result.append(res)  # can also be accessed using result[0]
- cursor.close()
- return render_template("index.html", result=result)
-
-# @app.route('/country', methods=['POST','GET'])
-# def country_top_scorer():
-#     word=request.form.get('which_country')
-#     max_min=request.form.get('max/min')
-#     age=request.form.get('age')
-#     year=request.form.get('year')
-#     year_born=int(year)-int(age)
-#     year_born=str(year_born)+"-01-01"
-#     if max_min=='max':
-#         query = "select distinct foo3.pname, t.tname, l.lname, c.cname, foo3.pgoal,foo3.birthday from " \
-#                 "(select p.pname, p.pid, p.pgoal, p.birthday from players p where p.pgoal in (select max(pgoal)from " \
-#                 "(select t.tid, foo1.cid, foo1.lid, t.tname from team t, belongs_tl btl,(select c.cid, l.lid " \
-#                 "from country c, league l, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid ) as foo1 where " \
-#                 "t.tid=btl.tid and foo1.lid=btl.lid) as foo2, players p, plays_in py, country c where p.pid=py.pid " \
-#                 "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
-#                 "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
-#                 "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
-#     else:
-#         query = "select distinct foo3.pname, t.tname, l.lname, c.cname, foo3.pgoal, foo3.birthday from " \
-#                 "(select p.pname, p.pid, p.pgoal, p.birthday from players p where p.pgoal in (select min(pgoal)from " \
-#                 "(select t.tid, foo1.cid, foo1.lid, t.tname from team t, belongs_tl btl,(select c.cid, l.lid " \
-#                 "from country c, league l, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid ) as foo1 where " \
-#                 "t.tid=btl.tid and foo1.lid=btl.lid) as foo2, players p, plays_in py, country c where p.pid=py.pid " \
-#                 "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
-#                 "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
-#                 "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
-#     cursor=g.conn.execute(query, (word,year_born))
-#     result=[]
-#     for res in cursor:
-#         result.append(res)
-#     cursor.close()
-#     print request.args
-#     return render_template("home.html", scorer=result,countries=home_init())
+@app.route('/', methods=['POST','GET'])
+def country_top_scorer():
+    word=request.form.get('country')
+    max_min=request.form.get('max/min')
+    year=request.form.get('bd')
+    if max_min=='max':
+        query = "select distinct foo3.pname, t.tname, l.lname, c.cname, foo3.pgoal,foo3.birthday from " \
+                "(select p.pname, p.pid, p.pgoal, p.birthday from players p where p.pgoal in (select max(pgoal)from " \
+                "(select t.tid, foo1.cid, foo1.lid, t.tname from team t, belongs_tl btl,(select c.cid, l.lid " \
+                "from country c, league l, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid ) as foo1 where " \
+                "t.tid=btl.tid and foo1.lid=btl.lid) as foo2, players p, plays_in py, country c where p.pid=py.pid " \
+                "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
+                "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
+                "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
+    else:
+        query = "select distinct foo3.pname, t.tname, l.lname, c.cname, foo3.pgoal, foo3.birthday from " \
+                "(select p.pname, p.pid, p.pgoal, p.birthday from players p where p.pgoal in (select min(pgoal)from " \
+                "(select t.tid, foo1.cid, foo1.lid, t.tname from team t, belongs_tl btl,(select c.cid, l.lid " \
+                "from country c, league l, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid ) as foo1 where " \
+                "t.tid=btl.tid and foo1.lid=btl.lid) as foo2, players p, plays_in py, country c where p.pid=py.pid " \
+                "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
+                "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
+                "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
+    cursor=g.conn.execute(query, (word,year))
+    result=[]
+    for res in cursor:
+        result.append(res)
+    cursor.close()
+    print request.args
+    return render_template("home.html", scorers=result,Countries=home_init(), countries=home_init())
 
 selected_countries=[]
 selected_leagues=[]
 selected_teams=[]
-
 
 @app.route("/country_dd", methods=['GET', 'POST'])
 def country_dd():
@@ -163,18 +149,18 @@ def country_dd():
 
 @app.route("/league_dd", methods=['GET','POST'])
 def league_dd():
-   query ="select t.tname from league l, belongs_tl tl, team t where l.lid = tl.lid and t.tid = tl.tid;"
-   league = str(request.form.get('which_league'))
-   if(league!="all leagues"):
-       query=query[0:len(query)-1]+" and l.lname=%s;"
-   cursor=g.conn.execute(query,league)
-   teams=[]
-   for cur in cursor:
-	   teams.append(cur[0])
-   cursor.close()
-   if(league not in selected_leagues):
-       selected_leagues.append(league)
-   return render_template('home.html', countries=selected_countries, leagues=selected_leagues, teams=teams)
+    query ="select t.tname from league l, belongs_tl tl, team t where l.lid = tl.lid and t.tid = tl.tid;"
+    league = str(request.form.get('which_league'))
+    if(league!="all leagues"):
+        query=query[0:len(query)-1]+" and l.lname=%s;"
+    cursor=g.conn.execute(query, league)
+    teams=[]
+    for cur in cursor:
+        teams.append(cur[0])
+    cursor.close()
+    if(league not in selected_leagues):
+        selected_leagues.append(league)
+    return render_template('home.html', countries=selected_countries, leagues=selected_leagues, teams=teams)
 
 @app.route("/team_dd", methods=['GET','POST'])
 def team_dd():
@@ -192,16 +178,31 @@ def team_dd():
 	return render_template("home.html",countries=selected_countries, leagues=selected_leagues, teams=selected_teams, players = players)
 
 
+@app.route("/champion_teams", methods=['GET','POST'])
+def champion_teams():
+    x=request.form.get('IsChamp')
+    query="select t.tname from team t where t.tid " +x+ " (select t.tid from team t, belongs_tc btc where t.tid=btc.tid);"
+    cursor=g.conn.execute(query, x)
+    champion_teams=[]
+    for cur in cursor:
+        champion_teams.append(cur[0])
+    cursor.close()
+    return render_template('home.html', countries=home_init(),champion_teams=champion_teams)
 
 
-
-
-
-
-
-
-
-
+@app.route("/match_history", methods=['GET', 'POST'])
+def match_history():
+    team=request.form.get('team')
+    order=str(request.form.get('order'))
+    query="select m.mid, m.mdate, t1.tname, m1.mname, m2.mname, t2.tname , m.home_goals, m.away_goals from match m, participate p, team t1, team t2, manager m1, manager m2, manages mag1, manages mag2 where m.mid=p.mid and t1.tid=p.tid and t2.tid=p.tid2 and m1.mid=mag1.mid and mag1.tid= t1.tid and m2.mid=mag2.mid and mag2.tid=t2.tid and (t1.tname= %s or t2.tname= %s) order by m.mdate;"
+    if(order=="DESC"):
+        query=query[0:len(query)-1]+" DESC"
+    matches=[]
+    cursor=g.conn.execute(query, (team ,team))
+    for cur in cursor:
+        matches.append(cur)
+    cursor.close()
+    return render_template('home.html', countries=home_init(), matches=matches)
 
 
 @app.route('/insert', methods=['POST','GET'])
@@ -230,8 +231,6 @@ def list_manager():
  cursor.close()
  # return redirect(url_for('insert'))
  return render_template("list.html", result=result)
-
-
 
 @app.route('/login')
 def login():
