@@ -120,6 +120,7 @@ def country_top_scorer():
                 "and foo2.tid=py.tid and c.cid=foo2.cid  and c.cname=%s)) as foo3, team t, league l, country c, " \
                 "plays_in py, belongs_tl btl, belongs_lc blc where foo3.pid=py.tid and t.tid=py.tid and btl.tid=t.tid " \
                 "and btl.lid=l.lid and blc.lid=l.lid and blc.cid=c.cid and foo3.birthday<=%s;"
+
     cursor=g.conn.execute(query, (word,year))
     result=[]
     for res in cursor:
@@ -215,29 +216,46 @@ def insert():
     cursor.close()
     return  render_template('insert.html', teams = teams)
 
-@app.route('/delete', methods=['POST','GET'])
+@app.route('/delete', methods=['POST', 'GET'])
 def delete():
-   return render_template('delete.html')
+    pname = request.form['pname']
+    return render_template('delete.html', msg = msg)
 
 @app.route('/insert_player', methods=['POST', 'GET'])
 def insert_player():
-    pname = request.form['pname']
-    pid = request.form['pid']
-    prating = request.form['prating']
-    pgoals = request.form['pgoals']
-    team = request.form['teams']
-    g.conn.execute("INSERT INTO players VALUES (%d, %d, %s, %d)", (pid, prating, pname, pgoals))
-    g.conn.execute("INSERT INTO plays_in VALUES (%d, %d, %s)", (pid, tid, since))
-    return render_template('insert.html')
+    pname = request.args.get('pname')
+    cursor = g.conn.execute("select MAX(pid) from players")
+    pid = []
+    for cur in cursor:
+        pid.append(cur[0])
+    pid = pid[0] + 1
+    prating = request.args.get('prating')
+    pgoals = request.args.get('pgoals')
+    tid = request.args.get('tid')
+    since = request.args.get('since')
+    g.conn.execute("INSERT INTO players VALUES (%s, %s, %s, %s)", (pid, prating, pname, pgoals))
+    g.conn.execute("INSERT INTO plays_in VALUES (%s, %s, %s)", (pid, tid, since))
+    cursor.close()
+    msg = "Record inserted successfully."
+    return render_template('insert_player.html', msg1 = msg)
 
-@app.route('/insert_manager', methods=['POST', 'GET'])
+@app.route('/insert_manager', methods=['GET'])
 def insert_manager():
- tname = request.form['tname']
- mid = request.form['mid']
- mname = request.form['mname']
- g.conn.execute("INSERT INTO manager VALUES (%s, %s)", (mid, mname))
- msg = "Record inserted successfully"
- return render_template("result.html", msg=msg)
+ mid = g.conn.execute("select MAX(mid) from manager")
+ mname = request.args.get('mname')
+ tid = request.form['tid']
+ since = request.args.get('since')
+ cursor = g.conn.execute("select m.mid from manages m where m.tid == %s", tid)
+ mid =[]
+ for cur in cursor:
+     mid.append(cur[0])
+ old_mid = mid[0]
+ g.conn.execute("DELETE FROM manager VALUES %d", old_mid)
+ g.conn.execute("INSERT INTO manager VALUES (%d, %s)", (mid, mname))
+ g.conn.execute("INSERT INTO manages VALUES (%d, %d)", (tid, mid))
+ cursor.close()
+ msg = "Record replaced successfully."
+ return render_template("insert_manager.html", msg2 = msg)
 
 @app.route('/list_manager', methods=['POST', 'GET'])
 def list_manager():

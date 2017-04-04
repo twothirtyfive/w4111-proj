@@ -1,25 +1,25 @@
 <html>
    <body>
-     <select name="msg">
-       print msg
-     </select>
-      <p>Insert player record.</p>
-      <p>Name: <input type="text" name="pname"></p>
-      <p>Player ID Number: <input type="text" name="pid"></p>
-      <p>Player Rating: <input type="text" name="prating"></p>
-      <p>Player Goals: <input type="text" name="pgoals"></p>
-      <p>Plays in: <form action={{url_for('insert_player')}} method="POST">
-          <select name="teams">
-            <option value="">Choose a team</option>
-            {% for team in teams %}
-            <option value="{{team}}">{{team}}</option>
-            {% endfor %}
-          </select>
-        </form>
-      <form action={{url_for('insert_player')}} methods=['POST', 'GET']
-        <select name="Submit" onChange='{this.form.submit();}'>
-          <button  type="submit">Submit</button>
-        </select>
-      </form>
+     <p><b>Team IDs: </b></p>
+     <p>KRC Genk : 1</p>
+     <p>Beerschot AC : 2</p>
+     <p>SV Zulte-Waregem : 3</p>
+     <p>Sporting Lokeren : 4</p>
+     <p>KSV Cercle Brugge : 5</p>
+     <p>RSC Anderlecht : 6</p>
+     <p>KAA Gent : 7</p>
+     <p>RAEC Mons : 8</p>
+     <p>FCV Dender EH : 9</p>
+     <p>Manchester United : 10</p>
+     <p>Chelsea : 11</p>
+     <p>Arsenal : 12</p>
+     <p>Manchester City : 13</p>
+     <p>Livepool: 14</p>
+     <br>
+     <br>
+     <p><a href ="insert_player">Insert Player Record</a></p>
+     <p><a href ="insert_manager">Insert Manager Record</a></p>
+
+
    </body>
 </html>

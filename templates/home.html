@@ -68,10 +68,7 @@ body{
 <p>Check which player scored the most/least goals in his country and was born before a certain year</p>
 <form action={{url_for('country_top_scorer')}} method='POST'>
   <select name="which_country">
-    {% if countries|length >1 %}
     <option value="">Select a country</option>
-    <option value="all countries">Select all</option>
-    {% endif %}
     {% for country in countries %}
     <option value="{{country}}">{{country}}</option>
     {% endfor %}
@@ -82,19 +79,13 @@ body{
       <option value="max">most</option>
       <option value="min">least</option>
     </select>
-    <select name="bd">
+    <select name="bd" onChange='{this.form.submit();}'>
+      <option value="">Born before certain year</option>
       <option value="1980-01-01">1980</option>
       <option value="1985-01-01">1985</option>
       <option value="1990-01-01">1990</option>
       <option value="1995-01-01">1995</option>
       <option value="2000-01-01">2000</option>
-    </select>
-      <button  type="submit">Go!</button>
-  </form>
-
-  <form action={{url_for('home')}} methods=['POST', 'GET']
-    <select name="reset" onChange='{this.form.submit();}'>
-      <button  type="submit">Reset</button>
     </select>
   </form>
 
@@ -168,6 +159,9 @@ body{
   {% endfor %}
 </table>
 
+
+    <p><a href ="insert">Insert records</a></p>
+
     <h1>European soccer database</h1>
     <p>This database has the following tables:</p>
     <p>players(pid,prating,pname, pgoal, PK(pid))</p>
@@ -184,9 +178,6 @@ body{
     <p>champions_league(tid, lid, PK(lid))</p>
     <p>participate(tid, mid, tid2, PK(mid))</p>
     <p>plays_in(pid, tid, since, PK(pid))</p>
-
-    <p><a href ="insert">Insert records</a></p>
-    <p><a href="delete">Delete records</a></p>
 
     </body>
 </html>
