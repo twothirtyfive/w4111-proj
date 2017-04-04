@@ -99,7 +99,7 @@ def home():
 
 @app.route('/', methods=['POST','GET'])
 def country_top_scorer():
-    word=request.form.get('country')
+    word=str(request.form.get('which_country'))
     max_min=request.form.get('max/min')
     year=request.form.get('bd')
     if max_min=='max':
@@ -194,7 +194,7 @@ def champion_teams():
 def match_history():
     team=request.form.get('team')
     order=str(request.form.get('order'))
-    query="select m.mid, m.mdate, t1.tname, m1.mname, m2.mname, t2.tname , m.home_goals, m.away_goals from match m, participate p, team t1, team t2, manager m1, manager m2, manages mag1, manages mag2 where m.mid=p.mid and t1.tid=p.tid and t2.tid=p.tid2 and m1.mid=mag1.mid and mag1.tid= t1.tid and m2.mid=mag2.mid and mag2.tid=t2.tid and (t1.tname= %s or t2.tname= %s) order by m.mdate;"
+    query="select m.mid, m.mdate, t1.tname, m1.mname, t2.tname, m2.mname , m.home_goals, m.away_goals from match m, participate p, team t1, team t2, manager m1, manager m2, manages mag1, manages mag2 where m.mid=p.mid and t1.tid=p.tid and t2.tid=p.tid2 and m1.mid=mag1.mid and mag1.tid= t1.tid and m2.mid=mag2.mid and mag2.tid=t2.tid and (t1.tname= %s or t2.tname= %s) order by m.mdate;"
     if(order=="DESC"):
         query=query[0:len(query)-1]+" DESC"
     matches=[]
@@ -207,11 +207,28 @@ def match_history():
 
 @app.route('/insert', methods=['POST','GET'])
 def insert():
-  return  render_template('insert.html')
+    query = "select t.tname from league l, belongs_tl tl, team t where l.lid = tl.lid and t.tid = tl.tid;"
+    cursor=g.conn.execute(query)
+    teams=[]
+    for cur in cursor:
+        teams.append(cur[0])
+    cursor.close()
+    return  render_template('insert.html', teams = teams)
 
 @app.route('/delete', methods=['POST','GET'])
 def delete():
    return render_template('delete.html')
+
+@app.route('/insert_player', methods=['POST', 'GET'])
+def insert_player():
+    pname = request.form['pname']
+    pid = request.form['pid']
+    prating = request.form['prating']
+    pgoals = request.form['pgoals']
+    team = request.form['teams']
+    g.conn.execute("INSERT INTO players VALUES (%d, %d, %s, %d)", (pid, prating, pname, pgoals))
+    g.conn.execute("INSERT INTO plays_in VALUES (%d, %d, %s)", (pid, tid, since))
+    return render_template('insert.html')
 
 @app.route('/insert_manager', methods=['POST', 'GET'])
 def insert_manager():

@@ -66,18 +66,21 @@ body{
 
 
 <p>Check which player scored the most/least goals in his country and was born before a certain year</p>
-  <form action={{url_for('country_top_scorer')}} method="POST">
-    <select name="country">
-      <option value="">Choose a country</option>
-      {% for country in Countries %}
-      <option value="{{country}}">{{country}}</option>
-      {% endfor %}
-    </select>
+<form action={{url_for('country_top_scorer')}} method='POST'>
+  <select name="which_country">
+    {% if countries|length >1 %}
+    <option value="">Select a country</option>
+    <option value="all countries">Select all</option>
+    {% endif %}
+    {% for country in countries %}
+    <option value="{{country}}">{{country}}</option>
+    {% endfor %}
+  </select>
 
     <select name="max/min">
-      <option value="">Choose max or min</option>
-      <option value="max">max</option>
-      <option value="min">min</option>
+      <option value="">Choose most or least</option>
+      <option value="max">most</option>
+      <option value="min">least</option>
     </select>
     <select name="bd">
       <option value="1980-01-01">1980</option>

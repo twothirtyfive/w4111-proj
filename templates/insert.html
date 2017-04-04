@@ -1,17 +1,25 @@
 <html>
    <body>
-      
-      <form action = "{{ url_for('insert_manager') }}" method = "POST">
-         Table Name<br>
-         <input type = "text" name = "tname" /></br>
-         
-         Manager ID<br>
-         <input type = "text" name = "mid" /><br>
-         
-         Manager Name<br>
-         <input type = "text" name = "mname" /><br>
-         <input type = "submit" value = "submit" /><br>
+     <select name="msg">
+       print msg
+     </select>
+      <p>Insert player record.</p>
+      <p>Name: <input type="text" name="pname"></p>
+      <p>Player ID Number: <input type="text" name="pid"></p>
+      <p>Player Rating: <input type="text" name="prating"></p>
+      <p>Player Goals: <input type="text" name="pgoals"></p>
+      <p>Plays in: <form action={{url_for('insert_player')}} method="POST">
+          <select name="teams">
+            <option value="">Choose a team</option>
+            {% for team in teams %}
+            <option value="{{team}}">{{team}}</option>
+            {% endfor %}
+          </select>
+        </form>
+      <form action={{url_for('insert_player')}} methods=['POST', 'GET']
+        <select name="Submit" onChange='{this.form.submit();}'>
+          <button  type="submit">Submit</button>
+        </select>
       </form>
-      
    </body>
 </html>
