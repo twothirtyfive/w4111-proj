@@ -148,6 +148,27 @@ def country_dd():
        selected_countries.append(country)
    return render_template('home.html', countries = selected_countries, leagues=leagues)
 
+
+
+# @app.route("/league_dd", methods=['GET','POST'])
+# def league_dd():
+#     query ="select t.tname from league l, belongs_tl tl, team t, country c, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid and c.cname=%s and l.lid = tl.lid and t.tid = tl.tid;"
+#     league = str(request.form.get('which_league'))
+#     country=str(request.form.get('which_country'))
+#     print(country)
+#     print("$")*80
+#     if(league!="all leagues"):
+#         query=query[0:len(query)-1]+" and l.lname=%s;"
+#     cursor=g.conn.execute(query, (country, league))
+#     teams=[]
+#     for cur in cursor:
+#         teams.append(cur[0])
+#     cursor.close()
+#     if(league not in selected_leagues):
+#         selected_leagues.append(league)
+#     return render_template('home.html', countries=selected_countries, leagues=selected_leagues, teams=teams)
+
+
 @app.route("/league_dd", methods=['GET','POST'])
 def league_dd():
     query ="select t.tname from league l, belongs_tl tl, team t where l.lid = tl.lid and t.tid = tl.tid;"
@@ -218,8 +239,47 @@ def insert():
 
 @app.route('/delete', methods=['POST', 'GET'])
 def delete():
-    pname = request.form['pname']
-    return render_template('delete.html', msg = msg)
+    return render_template('delete.html')
+
+@app.route('/delete_which_player', methods=['POST','GET'])
+def delete_which_player():
+    pname=request.args.get('pname')
+    query="select * from players p where p.pname=%s;"
+    cursor=g.conn.execute(query, pname)
+    players=[]
+    for cur in cursor:
+        players.append(cur)
+    #msg="You've deleted player {} successfully".format(pname)
+    return render_template('delete_which_player.html', players=players)
+
+@app.route('/delete_player', methods=['POST','GET'])
+def delete_player():
+    pid=request.args.get('pid')
+    query="delete from plays_in pl where pl.pid=%s;delete from players p where p.pid=%s;"
+    g.conn.execute(query, (pid,pid))
+    msg="You've deleted player {} successfully".format(pid)
+    return render_template('delete_which_player.html',msg=msg)
+
+
+@app.route('/delete_which_manager', methods=['POST','GET'])
+def delete_which_manager():
+    mname=request.args.get('mname')
+    query="select m.mid, m.mname, t.tname, ma.since from manager m, manages ma, team t where m.mname=%s and ma.mid=m.mid and t.tid=ma.tid;"
+    cursor=g.conn.execute(query, mname)
+    managers=[]
+    for cur in cursor:
+        managers.append(cur)
+    cursor.close()
+    return render_template('delete_which_manager.html', managers=managers)
+
+@app.route('/delete_manager', methods=['POST','GET'])
+def delete_manager():
+    mid=request.args.get('mid')
+    query="delete from manages where manages.mid=%s; delete from manager m where m.mid=%s;"
+    g.conn.execute(query, (mid,mid))
+    msg="You've deleted manager {} successfully".format(mid)
+    return render_template('delete_which_manager.html',msg=msg)
+
 
 @app.route('/insert_player', methods=['POST', 'GET'])
 def insert_player():

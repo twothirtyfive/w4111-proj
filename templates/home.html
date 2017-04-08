@@ -1,4 +1,7 @@
 <html>
+<head>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+</head>
 <style>
 body{
   font-size: 15pt;
@@ -18,7 +21,7 @@ body{
     <option value="{{country}}">{{country}}</option>
     {% endfor %}
   </select>
-  </form>
+</form>
 
         <form action={{url_for('league_dd')}} method="POST">
             <select name="which_league" onChange='{this.form.submit();}'>
@@ -27,7 +30,8 @@ body{
                 <option value="{{league}}">{{league}}</option>
                 {% endfor %}
             </select>
-        </form>
+          </form>
+
 
 
     <form action={{url_for('team_dd')}} method="POST">
@@ -45,6 +49,8 @@ body{
       </select>
     </form>
 
+
+{% if players|length>0 %}
     <table border=1>
         <thead>
             <td>Name</td>
@@ -60,6 +66,7 @@ body{
       </tr>
     {% endfor %}
   </table>
+  {% endif %}
 
 <br>
 <br>
@@ -89,6 +96,14 @@ body{
     </select>
   </form>
 
+  <form action={{url_for('home')}} methods=['POST', 'GET']
+    <select name="reset" onChange='{this.form.submit();}'>
+      <button  type="submit">Reset</button>
+    </select>
+  </form>
+
+
+{% if scorers|length>0 %}
   <table border=1>
       <thead>
           <td>Name</td>
@@ -106,6 +121,7 @@ body{
     </tr>
   {% endfor %}
 </table>
+{% endif %}
 
 <br>
 <br>
@@ -139,6 +155,7 @@ body{
   </select>
 </form>
 
+  {% if matches|length>0 %}
   <table border=1>
       <thead>
           <td>Match ID</td>
@@ -158,9 +175,11 @@ body{
     </tr>
   {% endfor %}
 </table>
-
+  {% endif %}
 
     <p><a href ="insert">Insert records</a></p>
+    <p><a href ="delete">Delete records</a></p>
+
 
     <h1>European soccer database</h1>
     <p>This database has the following tables:</p>

@@ -1,0 +1,37 @@
+<html>
+<p>Search a player by his name</p>
+
+<form action={{url_for('delete_which_player')}} method=['GET','POST']>
+<input type="text" name="pname"></input>
+ <input type="submit" value="Search"></input>
+</form>
+
+<p>Delete a player by his ID</p>
+<form action={{url_for('delete_player')}} method=['GET','POST']>
+<input type="text" name="pid"></input>
+ <input type="submit" value="Delete"></input>
+</form>
+
+{% if players|length>0 %}
+<table border=1>
+    <thead>
+        <td>ID</td>
+        <td>rating</td>
+        <td>name</td>
+        <td>goals</td>
+        <td>birthday</td>
+     </thead>
+     {% for player in players %}
+        <tr>
+          {% for att in player %}
+          <td>{{att}}</td>
+          {% endfor %}
+       </tr>
+     {% endfor %}
+</table>
+{% endif%}
+
+{{msg}}
+
+<p><a href ="/">Go to home page</a></p>
+</html>
