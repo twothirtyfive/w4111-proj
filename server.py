@@ -19,6 +19,7 @@ from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, url_for
 
+
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
@@ -36,7 +37,6 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 DATABASEURI = "postgresql://gx2127:9667@104.196.18.7/w4111"
 
-#
 # This line creates a database engine that knows how to connect to the URI above.
 #
 engine = create_engine(DATABASEURI)
@@ -45,11 +45,11 @@ engine = create_engine(DATABASEURI)
 # Example of running queries in your database
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
- id serial,
- name text
-);""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
+# engine.execute("""CREATE TABLE IF NOT EXISTS test (
+#  id serial,
+#  name text
+# );""")
+# engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 
 
 @app.before_request
@@ -148,27 +148,6 @@ def country_dd():
        selected_countries.append(country)
    return render_template('home.html', countries = selected_countries, leagues=leagues)
 
-
-
-# @app.route("/league_dd", methods=['GET','POST'])
-# def league_dd():
-#     query ="select t.tname from league l, belongs_tl tl, team t, country c, belongs_lc blc where c.cid=blc.cid and l.lid=blc.lid and c.cname=%s and l.lid = tl.lid and t.tid = tl.tid;"
-#     league = str(request.form.get('which_league'))
-#     country=str(request.form.get('which_country'))
-#     print(country)
-#     print("$")*80
-#     if(league!="all leagues"):
-#         query=query[0:len(query)-1]+" and l.lname=%s;"
-#     cursor=g.conn.execute(query, (country, league))
-#     teams=[]
-#     for cur in cursor:
-#         teams.append(cur[0])
-#     cursor.close()
-#     if(league not in selected_leagues):
-#         selected_leagues.append(league)
-#     return render_template('home.html', countries=selected_countries, leagues=selected_leagues, teams=teams)
-
-
 @app.route("/league_dd", methods=['GET','POST'])
 def league_dd():
     query ="select t.tname from league l, belongs_tl tl, team t where l.lid = tl.lid and t.tid = tl.tid;"
@@ -237,6 +216,66 @@ def insert():
     cursor.close()
     return  render_template('insert.html', teams = teams)
 
+@app.route('/insert_which_player', methods=['GET'])
+def insert_which_player():
+    return render_template('insert_player.html')
+
+
+@app.route('/insert_player', methods=['GET','POST'])
+def insert_player():
+    pid=request.args.get('pid')
+    pname = request.args.get('pname')
+    pgoal=request.args.get('pgoal')
+    prating=request.args.get('prating')
+    tid=request.args.get('tid')
+    birthday=request.args.get('birthday')
+    since=request.args.get('since')
+    query="insert into players values(%s, %s, %s, %s, %s); insert into plays_in values(%s, %s, %s);"
+    cursor = g.conn.execute(query, (pid, prating,pname,pgoal,birthday,pid, tid, since))
+    cursor.close()
+    msg = "Record inserted successfully."
+    return render_template('insert_player.html', msg = msg)
+
+
+
+@app.route('/query_players_in_team', methods=['GET'])
+def query_players_in_team():
+    teamid=request.args.get('teamid')
+    query="select p.pid, p.prating, p.pname, p.pgoal, p.birthday,pi.tid, pi.since from players p, plays_in pi where p.pid=pi.pid and pi.tid=%s;"
+    cursor=g.conn.execute(query, teamid)
+    players=[]
+    for cur in cursor:
+        players.append(cur)
+    cursor.close()
+    return render_template('insert_player.html', players=players)
+
+@app.route('/insert_which_manager', methods=['GET'])
+def insert_which_manager():
+ return render_template("insert_manager.html")
+
+@app.route('/insert_manager', methods=['GET'])
+def insert_manager():
+    mid=request.args.get('mid')
+    mname=request.args.get('mname')
+    tid=request.args.get('tid')
+    since=request.args.get('since')
+    query="insert into manager values(%s, %s); insert into manages values(%s, %s, %s);"
+    cursor=g.conn.execute(query,(mid, mname, tid, mid, since))
+    cursor.close()
+    msg="You've inserted manager {} ({}) successfully".format(mname,mid)
+    return render_template('insert_manager.html', msg=msg)
+
+@app.route('/query_managers_in_team', methods=['GET'])
+def query_managers_in_team():
+    mid=request.args.get('managerid')
+    query="select m.mid, m.mname, t.tname, t.tid, ma.since from manager m, manages ma, team t where m.mid=ma.mid and t.tid=ma.tid and m.mid=%s"
+    cursor=g.conn.execute(query, mid)
+    managers=[]
+    for cur in cursor:
+        managers.append(cur)
+    cursor.close()
+    return render_template("insert_manager.html", managers=managers)
+
 @app.route('/delete', methods=['POST', 'GET'])
 def delete():
     return render_template('delete.html')
@@ -249,7 +288,6 @@ def delete_which_player():
     players=[]
     for cur in cursor:
         players.append(cur)
-    #msg="You've deleted player {} successfully".format(pname)
     return render_template('delete_which_player.html', players=players)
 
 @app.route('/delete_player', methods=['POST','GET'])
@@ -281,42 +319,6 @@ def delete_manager():
     return render_template('delete_which_manager.html',msg=msg)
 
 
-@app.route('/insert_player', methods=['POST', 'GET'])
-def insert_player():
-    pname = request.args.get('pname')
-    cursor = g.conn.execute("select MAX(pid) from players")
-    pid = []
-    for cur in cursor:
-        pid.append(cur[0])
-    pid = pid[0] + 1
-    prating = request.args.get('prating')
-    pgoals = request.args.get('pgoals')
-    tid = request.args.get('tid')
-    since = request.args.get('since')
-    g.conn.execute("INSERT INTO players VALUES (%s, %s, %s, %s)", (pid, prating, pname, pgoals))
-    g.conn.execute("INSERT INTO plays_in VALUES (%s, %s, %s)", (pid, tid, since))
-    cursor.close()
-    msg = "Record inserted successfully."
-    return render_template('insert_player.html', msg1 = msg)
-
-@app.route('/insert_manager', methods=['GET'])
-def insert_manager():
- mid = g.conn.execute("select MAX(mid) from manager")
- mname = request.args.get('mname')
- tid = request.form['tid']
- since = request.args.get('since')
- cursor = g.conn.execute("select m.mid from manages m where m.tid == %s", tid)
- mid =[]
- for cur in cursor:
-     mid.append(cur[0])
- old_mid = mid[0]
- g.conn.execute("DELETE FROM manager VALUES %d", old_mid)
- g.conn.execute("INSERT INTO manager VALUES (%d, %s)", (mid, mname))
- g.conn.execute("INSERT INTO manages VALUES (%d, %d)", (tid, mid))
- cursor.close()
- msg = "Record replaced successfully."
- return render_template("insert_manager.html", msg2 = msg)
-
 @app.route('/list_manager', methods=['POST', 'GET'])
 def list_manager():
  cursor = g.conn.execute('select * from manager;')
@@ -324,7 +326,6 @@ def list_manager():
  for res in cursor:
    result.append(res)  # can also be accessed using result[0]
  cursor.close()
- # return redirect(url_for('insert'))
  return render_template("list.html", result=result)
 
 @app.route('/login')
@@ -357,6 +358,5 @@ if __name__ == "__main__":
   HOST, PORT = host, port
   print "running on %s:%d" % (HOST, PORT)
   app.run(host=HOST, port=PORT, debug=True, threaded=threaded)
-
-
+  
  run()

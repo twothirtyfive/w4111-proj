@@ -1,0 +1,69 @@
+<html>
+<h1>Insert player</h1>
+<p><b>Team IDs: </b></p>
+<p>KRC Genk : 1</p>
+<p>Beerschot AC : 2</p>
+<p>SV Zulte-Waregem : 3</p>
+<p>Sporting Lokeren : 4</p>
+<p>KSV Cercle Brugge : 5</p>
+<p>RSC Anderlecht : 6</p>
+<p>KAA Gent : 7</p>
+<p>RAEC Mons : 8</p>
+<p>FCV Dender EH : 9</p>
+<p>Manchester United : 10</p>
+<p>Chelsea : 11</p>
+<p>Arsenal : 12</p>
+<p>Manchester City : 13</p>
+<p>Livepool: 14</p>
+<br>
+<br>
+<p>Insert a player here</p>
+
+<form action={{url_for('insert_player')}} method=['POST']>
+<p>Player ID</p>
+<input type="text" name="pid"></input>
+<p>Player rating</p>
+<input type="text" name="prating"></input>
+<p>Player name</p>
+<input type="text" name="pname"></input>
+<p>Player goals</p>
+<input type="text" name="pgoal"></input>
+<p>Team ID</p>
+<input type="text" name="tid"></input>
+<p>Player birthday</p>
+<input type="text" name="birthday"></input>
+<p>Joined the team sicnce</p>
+<input type="text" name="since"></input>
+<input type="submit" name="botton" value="Insert" onChange='{this.form.submit();}'></input>
+</form>
+{{msg}}
+
+<p>Check inserted players by team ID</p>
+<form action={{url_for('query_players_in_team')}} method=['POST', 'GET']>
+<input type="text" name="teamid"></input>
+<input type="submit" value="Check"></input>
+</form>
+
+{% if players|length>0 %}
+<table border=1>
+    <thead>
+        <td>ID</td>
+        <td>rating</td>
+        <td>name</td>
+        <td>goals</td>
+        <td>birthday</td>
+        <td>team ID</td>
+        <td>joined since</td>
+     </thead>
+     {% for player in players %}
+        <tr>
+          {% for att in player %}
+          <td>{{att}}</td>
+          {% endfor %}
+       </tr>
+     {% endfor %}
+</table>
+{% endif%}
+<p><a href ="/">Go to home page</a></p>
+
+</html>

@@ -1,6 +1,6 @@
 <html>
 <head>
-  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
 </head>
 <style>
 body{
@@ -10,6 +10,27 @@ body{
 </style>
 
 <body>
+  <h1>European soccer database</h1><p>By Guowei Xu (gx2127), Julian Kocher (jk3813)</p>
+  <p>This database has the following tables:</p>
+  <p>players(pid,prating,pname, pgoal, PK(pid)) &emsp;&emsp;
+    manager(mid, mname, PK(mid))&emsp;&emsp;
+    manages(tid, mid, since, PK(mid, since)) &emsp;&emsp;
+    country(cid, cname, PK(cid))</p>
+  <p>league(lid, lname, PK(lid))&emsp;&emsp;
+    match(mid, mdate, PK(mid))&emsp;&emsp;
+    team(tid, tname, PK(tid))&emsp;&emsp;
+    belongs_cl(lid, since, PK(lid)) &emsp;&emsp;
+    belongs_lc(lid, cid, since, PK(lid))</p>
+  <p>belongs_tc(tid, since,PK(tid)) &emsp;&emsp;
+    belongs_tl(tid, lid since, PK(tid, lid)) &emsp;&emsp;
+    champions_league(tid, lid, PK(lid)) &emsp;&emsp;
+    participate(tid, mid, tid2, PK(mid)) &emsp;&emsp;
+    <p>plays_in(pid, tid, since, PK(pid))</p>
+
+
+<br>
+<br>
+
 <p>Check players that belong to a country, a league or a team</p>
 <form action={{url_for('country_dd')}} method='POST'>
   <select name="which_country" onChange='{this.form.submit();}'>
@@ -180,23 +201,6 @@ body{
     <p><a href ="insert">Insert records</a></p>
     <p><a href ="delete">Delete records</a></p>
 
-
-    <h1>European soccer database</h1>
-    <p>This database has the following tables:</p>
-    <p>players(pid,prating,pname, pgoal, PK(pid))</p>
-    <p>manager(mid, mname, PK(mid))</p>
-    <p>manages(tid, mid, since, PK(mid, since))</p>
-    <p>country(cid, cname, PK(cid))</p>
-    <p>league(lid, lname, PK(lid))</p>
-    <p>match(mid, mdate, PK(mid))</p>
-    <p>team(tid, tname, PK(tid))</p>
-    <p>belongs_cl(lid, since, PK(lid))</p>
-    <p>belongs_lc(lid, cid, since, PK(lid))</p>
-    <p>belongs_tc(tid, since,PK(tid))</p>
-    <p>belongs_tl(tid, lid since, PK(tid, lid))</p>
-    <p>champions_league(tid, lid, PK(lid))</p>
-    <p>participate(tid, mid, tid2, PK(mid))</p>
-    <p>plays_in(pid, tid, since, PK(pid))</p>
 
     </body>
 </html>

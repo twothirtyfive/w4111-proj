@@ -1,0 +1,61 @@
+<html>
+<h1>Insert manager</h1>
+<p><b>Team IDs: </b></p>
+<p>KRC Genk : 1</p>
+<p>Beerschot AC : 2</p>
+<p>SV Zulte-Waregem : 3</p>
+<p>Sporting Lokeren : 4</p>
+<p>KSV Cercle Brugge : 5</p>
+<p>RSC Anderlecht : 6</p>
+<p>KAA Gent : 7</p>
+<p>RAEC Mons : 8</p>
+<p>FCV Dender EH : 9</p>
+<p>Manchester United : 10</p>
+<p>Chelsea : 11</p>
+<p>Arsenal : 12</p>
+<p>Manchester City : 13</p>
+<p>Livepool: 14</p>
+<br>
+<br>
+<p>Insert a manager here</p>
+
+<form action={{url_for('insert_manager')}} method=['POST']>
+<p>Manager ID</p>
+<input type="text" name="mid"></input>
+<p>Manager name</p>
+<input type="text" name="mname"></input>
+<p>Team ID</p>
+<input type="text" name="tid"></input>
+<p>Coached the team sicnce</p>
+<input type="text" name="since"></input>
+<input type="submit" name="botton" value="Insert" onChange='{this.form.submit();}'></input>
+</form>
+{{msg}}
+
+<p>Check inserted managers by manager ID</p>
+<form action={{url_for('query_managers_in_team')}} method=['POST', 'GET']>
+<input type="text" name="managerid"></input>
+<input type="submit" value="Check"></input>
+</form>
+
+{% if managers|length>0 %}
+<table border=1>
+    <thead>
+        <td>ID</td>
+        <td>name</td>
+        <td>team</td>
+        <td>team ID</td>
+        <td>since</td>
+     </thead>
+     {% for manager in managers %}
+        <tr>
+          {% for att in manager %}
+          <td>{{att}}</td>
+          {% endfor %}
+       </tr>
+     {% endfor %}
+</table>
+{% endif%}
+<p><a href ="/">Go to home page</a></p>
+
+</html>
